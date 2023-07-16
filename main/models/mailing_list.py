@@ -1,5 +1,7 @@
 from django.db import models
 
+from main.models.message import Message
+
 NULLABLE = {'blank': True, 'null': True}
 
 
@@ -25,6 +27,7 @@ class Mailing(models.Model):
         verbose_name='статус рассылки'
     )
     is_active = models.BooleanField(default=False, verbose_name='рассылка активна')
+    # message = models.ForeignKey(Message, on_delete=models.CASCADE, **NULLABLE)
 
     def __str__(self):
         return f'{self.periodicity}, {self.mailing_status}: {self.is_active}'

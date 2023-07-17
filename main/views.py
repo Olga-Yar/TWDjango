@@ -6,7 +6,7 @@ from django.views import generic
 
 from config import settings
 from main.forms import MessageForm, MailingForm
-from main.models import Message, Mailing
+from main.models import Message, Mailing, LogiMail
 
 
 class IndexView(generic.View):
@@ -47,8 +47,46 @@ class MessageCreateView(generic.CreateView):
 
         return context_data
 
+    def form_valid(self, form):
+        formset = self.get_context_data()['formset']
+        self.object = form.save()
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+
+        return super().form_valid(form)
+
 
 class MessageUpdateView(generic.UpdateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('main:message_item')
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        SubjectFormset = inlineformset_factory(Message, Mailing, form=MailingForm, extra=1)
+        if self.request.method == 'POST':
+            context_data['formset'] = SubjectFormset(self.request.POST)
+        else:
+            context_data['formset'] = SubjectFormset()
+
+        return context_data
+
+    # def form_valid(self, form):
+    #     formset = self.get_context_data()['formset']
+    #     self.object = form.save()
+    #
+    #     if formset.is_valid():
+    #         formset.instance = self.object
+    #         formset.save()
+    #
+    #     return super().form_valid(form)
+
+
+class MailingListView(generic.ListView):
+    model = Mailing
+
+
+class LogiListView(generic.ListView):
+    model = LogiMail

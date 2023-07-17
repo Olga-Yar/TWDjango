@@ -11,11 +11,11 @@ class MailingAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('title', 'context', 'mailing')
-    search_fields = ('title', 'mailing',)
+    list_display = ('title', 'context')
+    search_fields = ('title',)
 
 
 @admin.register(LogiMail)
 class LogiMailAdmin(admin.ModelAdmin):
-    list_display = ('date_last', 'status', 'server_answer', 'message')
+    list_display = ('date_last', 'status', 'server_answer', 'mailing')
     search_fields = ('date_last', 'status',)

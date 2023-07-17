@@ -15,8 +15,6 @@ class User(AbstractUser):
 
     email_verify = models.BooleanField(default=False)
 
-    mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, verbose_name='рассылка', **NULLABLE)
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

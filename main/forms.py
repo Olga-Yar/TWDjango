@@ -14,7 +14,7 @@ class MessageForm(StyleForMixin, forms.ModelForm):
 
     class Meta:
         model = Message
-        fields = ('title', 'context', 'mailing')
+        fields = ('title', 'context')
 
 
 class MailingForm(StyleForMixin, forms.ModelForm):

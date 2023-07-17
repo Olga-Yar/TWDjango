@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from main.models.message import Message
@@ -27,7 +28,10 @@ class Mailing(models.Model):
         verbose_name='статус рассылки'
     )
     is_active = models.BooleanField(default=False, verbose_name='рассылка активна')
-    # message = models.ForeignKey(Message, on_delete=models.CASCADE, **NULLABLE)
+    message = models.ForeignKey('Message', on_delete=models.CASCADE, **NULLABLE)
+    client = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                    **NULLABLE,
+                                    verbose_name='клиент')
 
     def __str__(self):
         return f'{self.periodicity}, {self.mailing_status}: {self.is_active}'

@@ -8,7 +8,7 @@ class Message(models.Model):
     context = models.TextField(blank=True, verbose_name='тело письма')
 
     def __str__(self):
-        return f'сообщение {self.title}: {self.mailing}'
+        return f'сообщение {self.title}'
 
     class Meta:
         verbose_name = 'Сообщение'

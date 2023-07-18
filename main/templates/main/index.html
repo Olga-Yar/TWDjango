@@ -17,7 +17,7 @@
     <div class="btn-group m-md-4">
         <a href="{% url 'main:message_item' object.pk %}" class="btn btn-sm btn-outline-secondary">Просмотр</a>
         <a href="{% url 'main:message_update' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
-        <a href="#" class="btn btn-sm btn-outline-secondary">Удалить</a>
+        <a href="{% url 'main:message_delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
     </div>
 
     <hr class="featurette-divider">

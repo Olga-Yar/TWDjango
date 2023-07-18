@@ -1,6 +1,6 @@
 from django import forms
 
-from main.models import Message, Mailing, LogiMail
+from main.models import Message, Mailing, LogiMail, Client
 
 
 class StyleForMixin:
@@ -22,3 +22,10 @@ class MailingForm(StyleForMixin, forms.ModelForm):
     class Meta:
         model = Mailing
         fields = ('mailing_time', 'periodicity', 'mailing_status', 'is_active')
+
+
+class ClientForm(StyleForMixin, forms.ModelForm):
+
+    class Meta:
+        model = Client
+        fields = ('first_name', 'last_name', 'email')

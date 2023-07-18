@@ -29,7 +29,7 @@ class Mailing(models.Model):
     )
     is_active = models.BooleanField(default=False, verbose_name='рассылка активна')
     message = models.ForeignKey('Message', on_delete=models.CASCADE, **NULLABLE)
-    client = models.ManyToManyField(settings.AUTH_USER_MODEL,
+    client = models.ManyToManyField('Client',
                                     **NULLABLE,
                                     verbose_name='клиент')
 

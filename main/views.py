@@ -40,6 +40,12 @@ class MessageListView(LoginRequiredMixin, generic.ListView):
             raise Http404
         return self.object
 
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.creator != self.request.user and not self.request.user.is_staff:
+            raise Http404
+        return self.object
+
 
 class MessageDetailView(LoginRequiredMixin, generic.DetailView):
     model = Message
@@ -112,7 +118,7 @@ class MessageUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user and not self.request.user.is_staff:
+        if self.object.creator != self.request.user:
             raise Http404
         return self.object
 
@@ -123,7 +129,7 @@ class MessageDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user and not self.request.user.is_staff:
+        if self.object.creator != self.request.user:
             raise Http404
         return self.object
 
@@ -138,6 +144,16 @@ class LogiListView(generic.ListView):
 
 class ClientListView(generic.ListView):
     model = Client
+
+
+class ClientDetailView(generic.DetailView):
+    model = Client
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.creator != self.request.user and not self.request.user.is_staff:
+            raise Http404
+        return self.object
 
 
 class ClientCreateView(generic.CreateView):

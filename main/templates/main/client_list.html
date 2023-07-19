@@ -16,8 +16,8 @@
 
     <div class="btn-group m-md-4">
         <a href="#" class="btn btn-sm btn-outline-secondary">Просмотр</a>
-        <a href="{% url 'main:client_update' %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
-        <a href="{% url 'main:client_delete' %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+        <a href="{% url 'main:client_update' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
+        <a href="{% url 'main:client_delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
     </div>
 
     <hr class="featurette-divider">

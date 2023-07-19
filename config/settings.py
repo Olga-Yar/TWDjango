@@ -154,3 +154,10 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379",
     }
 }
+
+# CRONJOB = [
+#     ('* * * * *', 'main.services.hourly_send'),
+#     ('* * * * *', 'main.services.daily_send'),
+#     ('* * * * *', 'main.services.weekly_send'),
+#     ('* * * * *', 'main.services.monthly_send'),
+# ]

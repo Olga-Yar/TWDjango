@@ -29,6 +29,10 @@ class IndexView(generic.View):
         return render(request, 'main/index.html', context)
 
 
+class MessageListView(generic.ListView):
+    model = Message
+
+
 class MessageDetailView(generic.DetailView):
     model = Message
 
@@ -36,7 +40,7 @@ class MessageDetailView(generic.DetailView):
 class MessageCreateView(generic.CreateView):
     model = Message
     form_class = MessageForm
-    success_url = reverse_lazy('main:home')
+    success_url = reverse_lazy('main:message_list')
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -48,22 +52,21 @@ class MessageCreateView(generic.CreateView):
 
         return context_data
 
-    def form_valid(self, form):
-        formset = self.get_context_data()['formset']
-        self.object = form.save()
-
-        if formset.is_valid():
-            formset.instance = self.object
-            formset.save()
-
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    #     formset = self.get_context_data()['formset']
+    #     self.object = form.save()
+    #
+    #     if formset.is_valid():
+    #         formset.instance = self.object
+    #         formset.save()
+    #
+    #     return super().form_valid(form)
 
 
 class MessageUpdateView(generic.UpdateView):
     model = Message
     form_class = MessageForm
-    success_url = reverse_lazy('main:message_item')
-
+    success_url = reverse_lazy('main:message_list')
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -75,17 +78,17 @@ class MessageUpdateView(generic.UpdateView):
 
         return context_data
 
-    def form_valid(self, form):
-        context_data = self.get_context_data()
-        formset = context_data['formset']
-        with transaction.atomic():
-            if form.is_valid():
-                self.object = form.save()
-                if formset.is_valid():
-                    formset.instance = self.object
-                    formset.save()
-
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    #     context_data = self.get_context_data()
+    #     formset = context_data['formset']
+    #     with transaction.atomic():
+    #         if form.is_valid():
+    #             self.object = form.save()
+    #             if formset.is_valid():
+    #                 formset.instance = self.object
+    #                 formset.save()
+    #
+    #     return super().form_valid(form)
 
 
 class MessageDeleteView(generic.DeleteView):
@@ -128,8 +131,6 @@ class ClientUpdateView(generic.UpdateView):
     form_class = MessageForm
     success_url = reverse_lazy('main:client_list')
 
-    def get_object(self, queryset=None):
-        return self.object
 
     def form_valid(self, form):
         self.object = form.save()

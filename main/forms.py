@@ -1,6 +1,6 @@
 from django import forms
 
-from main.models import Message, Mailing, LogiMail, Client
+from main.models import Message, Mailing, LogiMail, Client, Blog
 
 
 class StyleForMixin:
@@ -34,5 +34,5 @@ class ClientForm(StyleForMixin, forms.ModelForm):
 class BlogForm(StyleForMixin, forms.ModelForm):
 
     class Meta:
-        model = Client
+        model = Blog
         fields = ('title', 'content', 'image', 'is_public')

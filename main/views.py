@@ -8,8 +8,8 @@ from django.urls import reverse_lazy
 from django.views import generic
 
 from config import settings
-from main.forms import MessageForm, MailingForm, ClientForm
-from main.models import Message, Mailing, LogiMail, Client
+from main.forms import MessageForm, MailingForm, ClientForm, BlogForm
+from main.models import Message, Mailing, LogiMail, Client, Blog
 
 
 class IndexView(generic.View):
@@ -198,4 +198,36 @@ class ClientUpdateView(LoginRequiredMixin, generic.UpdateView):
             formset.save()
 
         return super().form_valid(form)
+
+
+class BlogListView(generic.ListView):
+    model = Blog
+
+
+class BlogDetailView(generic.DetailView):
+    model = Blog
+
+    def get_object(self, queryset=None):
+        blog = super().get_object(queryset=queryset)
+        blog.num_views += 1
+        blog.save()
+        return blog
+
+
+class BlogCreateView(generic.CreateView):
+    model = Blog
+    form_class = BlogForm
+    success_url = reverse_lazy('catalog:blog_list')
+
+
+class BlogUpdateView(generic.UpdateView):
+    model = Blog
+    form_class = BlogForm
+    success_url = reverse_lazy('catalog:blog_item')
+
+
+class BlogDeleteView(generic.DeleteView):
+    model = Blog
+    success_url = reverse_lazy('catalog:blog_list')
+
 

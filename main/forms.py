@@ -29,3 +29,10 @@ class ClientForm(StyleForMixin, forms.ModelForm):
     class Meta:
         model = Client
         fields = ('first_name', 'last_name', 'email')
+
+
+class BlogForm(StyleForMixin, forms.ModelForm):
+
+    class Meta:
+        model = Client
+        fields = ('title', 'content', 'image', 'is_public')

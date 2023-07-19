@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from main.models import Mailing, Message, LogiMail
+from main.models import Mailing, Message, LogiMail, Blog
 
 
 @admin.register(Mailing)
@@ -19,3 +19,9 @@ class MessageAdmin(admin.ModelAdmin):
 class LogiMailAdmin(admin.ModelAdmin):
     list_display = ('date_last', 'status', 'server_answer', 'mailing')
     search_fields = ('date_last', 'status',)
+
+
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'content', 'image', 'date_create', 'is_public', 'num_views')
+    search_fields = ('title', 'date_create', 'is_public')

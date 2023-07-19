@@ -15,9 +15,11 @@
     </div>
 
     <div class="btn-group m-md-4">
-        <a href="{% url 'main:message_item' object.pk %}" class="btn btn-sm btn-outline-secondary">Просмотр</a>
-        <a href="{% url 'main:message_update' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
-        <a href="{% url 'main:message_delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+        {% if object.creator %}
+            <a href="{% url 'main:message_item' object.pk %}" class="btn btn-sm btn-outline-secondary">Просмотр</a>
+            <a href="{% url 'main:message_update' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
+            <a href="{% url 'main:message_delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+        {% endif %}
     </div>
 
     <hr class="featurette-divider">

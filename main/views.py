@@ -13,6 +13,7 @@ from main.models import Message, Mailing, LogiMail, Client, Blog
 
 
 class IndexView(generic.View):
+    # главная страница
     def get(self, request):
 
         if settings.CACHES_ENABLE:
@@ -32,15 +33,11 @@ class IndexView(generic.View):
 
 
 class MessageListView(LoginRequiredMixin, generic.ListView):
+    # список сообщений
     model = Message
 
     def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user and not self.request.user.is_staff:
-            raise Http404
-        return self.object
-
-    def get_object(self, queryset=None):
+        # вывод сообщений для создателя и менеджера
         self.object = super().get_object(queryset)
         if self.object.creator != self.request.user and not self.request.user.is_staff:
             raise Http404
@@ -48,9 +45,11 @@ class MessageListView(LoginRequiredMixin, generic.ListView):
 
 
 class MessageDetailView(LoginRequiredMixin, generic.DetailView):
+    # отображение сообщения
     model = Message
 
     def get_object(self, queryset=None):
+        # вывод сообщения для создателя и менеджера
         self.object = super().get_object(queryset)
         if self.object.creator != self.request.user and not self.request.user.is_staff:
             raise Http404
@@ -58,11 +57,13 @@ class MessageDetailView(LoginRequiredMixin, generic.DetailView):
 
 
 class MessageCreateView(generic.CreateView):
+    # создание сообщения
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('main:message_list')
 
     def get_context_data(self, **kwargs):
+        # добавление указания условий рассылки
         context_data = super().get_context_data(**kwargs)
         SubjectFormset = inlineformset_factory(Message, Mailing, form=MailingForm, extra=1)
         if self.request.method == 'POST':
@@ -73,6 +74,7 @@ class MessageCreateView(generic.CreateView):
         return context_data
 
     def form_valid(self, form):
+        # сохранение формсета с новыми данными
         formset = self.get_context_data()['formset']
         self.object = form.save()
 
@@ -82,11 +84,12 @@ class MessageCreateView(generic.CreateView):
 
         return super().form_valid(form)
 
-    def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user and not self.request.user.is_staff:
-            raise Http404
-        return self.object
+    # def get_object(self, queryset=None):
+    #     # ограничение прав
+    #     self.object = super().get_object(queryset)
+    #     if self.object.creator != self.request.user and not self.request.user.is_staff:
+    #         raise Http404
+    #     return self.object
 
 
 class MessageUpdateView(LoginRequiredMixin, generic.UpdateView):

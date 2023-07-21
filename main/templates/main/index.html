@@ -4,25 +4,23 @@
 {% block content %}
 
     <hr class="featurette-divider">
-    <a href="{% url 'main:message_create' %}" class="btn btn-sm btn-outline-secondary m-md-4">Создать сообщение</a>
-{% for object in message_list %}
 
     <div class="row featurette">
       <div class="col-md-12 m-md-4">
-        <h2 class="featurette-heading fw-normal lh-1">{{object.title}} </h2>
-        <p class="lead">{{object.context|linebreaks|truncatewords:10}}</p>
+        <h1 class="featurette-heading fw-normal lh-1">{{object.count_mailing}} </h1>
+        <h1 class="featurette-heading fw-normal lh-1">{{object.count_mailing_active}} </h1>
+        <h1 class="featurette-heading fw-normal lh-1">{{object.count_unique_client}} </h1>
       </div>
-    </div>
-
-    <div class="btn-group m-md-4">
-        <a href="{% url 'main:message_item' object.pk %}" class="btn btn-sm btn-outline-secondary">Просмотр</a>
-        <a href="{% url 'main:message_update' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
-        <a href="{% url 'main:message_delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+        {% for object in blog_random %}
+        <div class="col-md-12 m-md-4">
+            <h2 class="featurette-heading fw-normal lh-1">{{object.title}} </h2>
+            <p class="lead">{{object.context|linebreaks|truncatewords:10}}</p>
+        </div>
+        {% endfor %}
     </div>
 
     <hr class="featurette-divider">
 
-{% endfor %}
 
 
 {% endblock %}

@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.db import transaction
@@ -16,17 +18,25 @@ class IndexView(generic.View):
     # главная страница
     def get(self, request):
 
-        if settings.CACHES_ENABLE:
-            key = 'message_list'
-            message_list = cache.get(key)
-            if message_list is None:
-                message_list = Message.objects.all()
-                cache.set(key, message_list)
-        else:
-            message_list = Message.objects.all()
+        count_mailing = Message.objects.all().count()
+        count_mailing_active = Mailing.objects.filter(is_active=True).count()
+        count_unique_client = Client.objects.all().distinct('email').count()
+        blog_random = []
+        count_blog = Blog.objects.all().count()
+
+        while len(blog_random) < 3:
+            pk_for_random = random.randint(1, count_blog)
+            if Blog.objects.get(pk=pk_for_random) in blog_random and not Blog.is_public:
+                continue
+            blog_list = Blog.objects.get(pk=pk_for_random)
+            if blog_list:
+                blog_random.append(blog_list)
 
         context = {
-            'message_list': message_list,
+            'count_mailing': count_mailing,
+            'count_mailing_active': count_mailing_active,
+            'count_unique_client': count_unique_client,
+            'blog_random': blog_random,
             'title': 'Главная'
         }
         return render(request, 'main/index.html', context)
@@ -164,12 +174,33 @@ class ClientCreateView(generic.CreateView):
     form_class = ClientForm
     success_url = reverse_lazy('main:client_list')
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        SubjectFormset = inlineformset_factory(Message, Mailing, form=MailingForm, extra=1)
+        if self.request.method == 'POST':
+            context_data['formset'] = SubjectFormset(self.request.POST, instance=self.object)
+        else:
+            context_data['formset'] = SubjectFormset(instance=self.object)
+
+        return context_data
+
     def form_valid(self, form):
-        self.object = form.save()
-        self.object.owner = self.request.user
-        self.object.save()
+        context_data = self.get_context_data()
+        formset = context_data['formset']
+        with transaction.atomic():
+            if form.is_valid():
+                self.object = form.save()
+                if formset.is_valid():
+                    formset.instance = self.object
+                    formset.save()
 
         return super().form_valid(form)
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.creator != self.request.user:
+            raise Http404
+        return self.object
 
 
 class ClientDeleteView(LoginRequiredMixin, generic.DeleteView):
@@ -220,17 +251,17 @@ class BlogDetailView(generic.DetailView):
 class BlogCreateView(generic.CreateView):
     model = Blog
     form_class = BlogForm
-    success_url = reverse_lazy('catalog:blog_list')
+    success_url = reverse_lazy('main:blog_list')
 
 
 class BlogUpdateView(generic.UpdateView):
     model = Blog
     form_class = BlogForm
-    success_url = reverse_lazy('catalog:blog_item')
+    success_url = reverse_lazy('main:blog_list')
 
 
 class BlogDeleteView(generic.DeleteView):
     model = Blog
-    success_url = reverse_lazy('catalog:blog_list')
+    success_url = reverse_lazy('main:blog_list')
 
 

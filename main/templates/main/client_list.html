@@ -15,11 +15,9 @@
     </div>
 
     <div class="btn-group m-md-4">
-        {% if object.creator %}
             <a href="#" class="btn btn-sm btn-outline-secondary">Просмотр</a>
             <a href="{% url 'main:client_update' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
             <a href="{% url 'main:client_delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
-        {% endif %}
     </div>
 
     <hr class="featurette-divider">

@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="row mb-2">
-    <div class="col-md-11">
+    <div class="col-md-11 m-3">
       <a href="{% url 'main:blog_create' %}" class="btn btn-sm btn-outline-secondary">Создать статью</a>
       {% for object in blog_list %}
         {% if object.is_public %}

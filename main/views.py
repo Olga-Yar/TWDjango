@@ -293,7 +293,7 @@ class ClientDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class ClientUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Client
-    form_class = MessageForm
+    form_class = ClientForm
     success_url = reverse_lazy('main:client_list')
     login_url = 'users:login'
     redirect_field_name = 'next'

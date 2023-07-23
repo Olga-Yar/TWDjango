@@ -9,11 +9,12 @@
         <p>{{ message.context|linebreaks }}</p>
         <hr>
 
-        <div class="m-md-5">
-            <span class="text-muted">{{mailing.mailing_time}}</span>
-            <span class="text-muted">{{mailing.periodicity}}</span>
-            <span class="text-muted">{{message.mailing_status}}</span>
-            <span class="text-muted">{{message.is_active}}</span>
+        <div class="m-md-2">
+            <span class="text-muted">Время рассылки: {{object.mailing.mailing_time}}</span></br>
+            <span class="text-muted">Периодичность рассылки: {{object.periodicity}}</span></br>
+            <span class="text-muted">Статус: {{object.mailing_status}}</span></br>
+            <span class="text-muted">Активна: {{object.is_active}}</span></br>
+            <span class="text-muted">Создал: {{object.creator.email}}</span></br>
         </div>
 
     </article>

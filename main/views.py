@@ -3,7 +3,7 @@ import random
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.db import transaction
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, modelformset_factory
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -39,12 +39,15 @@ class IndexView(generic.View):
             'blog_random': blog_random,
             'title': 'Главная'
         }
+        print(count_mailing, count_mailing_active, count_unique_client, blog_random)
         return render(request, 'main/index.html', context)
 
 
 class MessageListView(LoginRequiredMixin, generic.ListView):
     # список сообщений
     model = Message
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def get_object(self, queryset=None):
         # вывод сообщений для создателя и менеджера
@@ -57,6 +60,8 @@ class MessageListView(LoginRequiredMixin, generic.ListView):
 class MessageDetailView(LoginRequiredMixin, generic.DetailView):
     # отображение сообщения
     model = Message
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def get_object(self, queryset=None):
         # вывод сообщения для создателя и менеджера
@@ -66,11 +71,13 @@ class MessageDetailView(LoginRequiredMixin, generic.DetailView):
         return self.object
 
 
-class MessageCreateView(generic.CreateView):
+class MessageCreateView(LoginRequiredMixin, generic.CreateView):
     # создание сообщения
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('main:message_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def get_context_data(self, **kwargs):
         # добавление указания условий рассылки
@@ -85,6 +92,7 @@ class MessageCreateView(generic.CreateView):
 
     def form_valid(self, form):
         # сохранение формсета с новыми данными
+        form.instance.creator = self.request.user
         formset = self.get_context_data()['formset']
         self.object = form.save()
 
@@ -93,19 +101,15 @@ class MessageCreateView(generic.CreateView):
             formset.save()
 
         return super().form_valid(form)
-
-    # def get_object(self, queryset=None):
-    #     # ограничение прав
-    #     self.object = super().get_object(queryset)
-    #     if self.object.creator != self.request.user and not self.request.user.is_staff:
-    #         raise Http404
-    #     return self.object
 
 
 class MessageUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('main:message_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
+    pk_url_kwarg = 'pk'
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -129,16 +133,18 @@ class MessageUpdateView(LoginRequiredMixin, generic.UpdateView):
 
         return super().form_valid(form)
 
-    def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user:
-            raise Http404
-        return self.object
+    # def get_object(self, queryset=None):
+    #     self.object = super().get_object(queryset)
+    #     if self.object.creator != self.request.user:
+    #         raise Http404
+    #     return self.object
 
 
 class MessageDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Message
     success_url = reverse_lazy('main:home')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
@@ -147,32 +153,109 @@ class MessageDeleteView(LoginRequiredMixin, generic.DeleteView):
         return self.object
 
 
-class MailingListView(generic.ListView):
+class MailingListView(LoginRequiredMixin, generic.ListView):
     model = Mailing
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
-class LogiListView(generic.ListView):
+class MailingDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Mailing
+    login_url = 'users:login'
+    redirect_field_name = 'next'
+
+
+class MailingCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Mailing
+    form_class = MailingForm
+    success_url = reverse_lazy('main:mailing_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
+
+    # def get_context_data(self, **kwargs):
+    #     # добавление указания условий рассылки
+    #     context_data = super().get_context_data(**kwargs)
+    #     SubjectFormset = inlineformset_factory(Message, Mailing, form=MailingForm, extra=1)
+    #     if self.request.method == 'POST':
+    #         context_data['formset'] = SubjectFormset(self.request.POST)
+    #     else:
+    #         context_data['formset'] = SubjectFormset()
+    #
+    #     return context_data
+    #
+    # def form_valid(self, form):
+    #     # сохранение формсета с новыми данными
+    #     formset = self.get_context_data()['formset']
+    #     self.object = form.save()
+    #
+    #     if formset.is_valid():
+    #         formset.instance = self.object
+    #         formset.save()
+    #
+    #     return super().form_valid(form)
+
+
+class MailingUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Mailing
+    form_class = MailingForm
+    success_url = reverse_lazy('main:mailing_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
+
+    # def get_context_data(self, **kwargs):
+    #     context_data = super().get_context_data(**kwargs)
+    #     SubjectFormset = inlineformset_factory(Message, Mailing, form=MessageForm, extra=1)
+    #     if self.request.method == 'POST':
+    #         context_data['formset'] = SubjectFormset(self.request.POST, instance=self.object)
+    #     else:
+    #         context_data['formset'] = SubjectFormset(instance=self.object)
+    #
+    #     return context_data
+    #
+    # def form_valid(self, form):
+    #     context_data = self.get_context_data()
+    #     formset = context_data['formset']
+    #     with transaction.atomic():
+    #         if form.is_valid():
+    #             self.object = form.save()
+    #             if formset.is_valid():
+    #                 formset.instance = self.object
+    #                 formset.save()
+    #
+    #     return super().form_valid(form)
+
+
+class MailingDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Mailing
+    success_url = reverse_lazy('mail:mailing_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
+
+
+class LogiListView(LoginRequiredMixin, generic.ListView):
     model = LogiMail
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
-class ClientListView(generic.ListView):
+class ClientListView(LoginRequiredMixin, generic.ListView):
     model = Client
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
-class ClientDetailView(generic.DetailView):
+class ClientDetailView(LoginRequiredMixin, generic.DetailView):
     model = Client
-
-    def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user and not self.request.user.is_staff:
-            raise Http404
-        return self.object
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
-class ClientCreateView(generic.CreateView):
+class ClientCreateView(LoginRequiredMixin, generic.CreateView):
     model = Client
     form_class = ClientForm
     success_url = reverse_lazy('main:client_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -190,36 +273,43 @@ class ClientCreateView(generic.CreateView):
         with transaction.atomic():
             if form.is_valid():
                 self.object = form.save()
+                message_instance = Message.objects.create(
+                    creator=self.request.user,
+                    client=self.object
+                )
                 if formset.is_valid():
-                    formset.instance = self.object
+                    formset.instance = message_instance
                     formset.save()
 
         return super().form_valid(form)
-
-    def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user:
-            raise Http404
-        return self.object
 
 
 class ClientDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Client
     success_url = reverse_lazy('main:client_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
 class ClientUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Client
     form_class = MessageForm
     success_url = reverse_lazy('main:client_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        SubjectFormset = inlineformset_factory(Client, Mailing, form=MailingForm, extra=1)
+        MailingFormset = modelformset_factory(Mailing, form=MailingForm, extra=1)
         if self.request.method == 'POST':
-            context_data['formset'] = SubjectFormset(self.request.POST)
+            context_data['formset'] = MailingFormset(
+                self.request.POST,
+                queryset=Mailing.objects.filter(client=self.object)
+            )
         else:
-            context_data['formset'] = SubjectFormset()
+            context_data['formset'] = MailingFormset(queryset=Mailing.objects.filter(
+                client=self.object
+            ))
 
         return context_data
 
@@ -228,8 +318,10 @@ class ClientUpdateView(LoginRequiredMixin, generic.UpdateView):
         self.object = form.save()
 
         if formset.is_valid():
-            formset.instance = self.object
-            formset.save()
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.client = self.object
+                instance.save()
 
         return super().form_valid(form)
 
@@ -248,20 +340,26 @@ class BlogDetailView(generic.DetailView):
         return blog
 
 
-class BlogCreateView(generic.CreateView):
+class BlogCreateView(LoginRequiredMixin, generic.CreateView):
     model = Blog
     form_class = BlogForm
     success_url = reverse_lazy('main:blog_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
-class BlogUpdateView(generic.UpdateView):
+class BlogUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Blog
     form_class = BlogForm
     success_url = reverse_lazy('main:blog_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 
-class BlogDeleteView(generic.DeleteView):
+class BlogDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Blog
     success_url = reverse_lazy('main:blog_list')
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
 

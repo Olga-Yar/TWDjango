@@ -21,7 +21,7 @@ class MailingForm(StyleForMixin, forms.ModelForm):
     # Создание формы для приложения Рассылки
     class Meta:
         model = Mailing
-        fields = ('mailing_time', 'periodicity', 'mailing_status', 'is_active')
+        fields = ('mailing_time', 'periodicity', 'mailing_status', 'is_active', 'client')
 
 
 class ClientForm(StyleForMixin, forms.ModelForm):

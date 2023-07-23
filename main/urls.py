@@ -6,7 +6,8 @@ from django.views.decorators.cache import cache_page
 from main.apps import MainConfig
 from main.views import IndexView, MessageDetailView, MessageCreateView, MessageUpdateView, MailingListView, \
     LogiListView, MessageDeleteView, ClientListView, ClientDeleteView, ClientUpdateView, ClientCreateView, \
-    MessageListView, ClientDetailView, BlogListView, BlogDetailView, BlogCreateView, BlogUpdateView, BlogDeleteView
+    MessageListView, ClientDetailView, BlogListView, BlogDetailView, BlogCreateView, BlogUpdateView, BlogDeleteView, \
+    MailingDetailView, MailingCreateView, MailingUpdateView, MailingDeleteView
 
 app_name = MainConfig.name
 
@@ -19,6 +20,10 @@ urlpatterns = [
     path('message/delete/<int:pk>/', MessageDeleteView.as_view(), name='message_delete'),  # удаление сообщения
 
     path('mailing/', MailingListView.as_view(), name='mailing_list'),  # список рассылок
+    path('mailing/<int:pk>/', MailingDetailView.as_view(), name='mailing_item'),
+    path('mailing/create/', MailingCreateView.as_view(), name='mailing_create'),
+    path('mailing/update/<int:pk>/', MailingUpdateView.as_view(), name='mailing_update'),
+    path('mailing/delete/<int:pk>/', MailingDeleteView.as_view(), name='mailing_delete'),
 
     path('logi/', LogiListView.as_view(), name='logi_list'),  # список логов
 

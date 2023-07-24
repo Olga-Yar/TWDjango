@@ -22,15 +22,14 @@ class IndexView(generic.View):
         count_mailing_active = Mailing.objects.filter(is_active=True).count()
         count_unique_client = Client.objects.all().distinct('email').count()
         blog_random = []
-        count_blog = Blog.objects.all().count()
+        count_blog = Blog.objects.filter(is_public=True).count()
 
-        while len(blog_random) < 3:
-            pk_for_random = random.randint(1, count_blog)
-            if Blog.objects.get(pk=pk_for_random) in blog_random and not Blog.is_public:
-                continue
-            blog_list = Blog.objects.get(pk=pk_for_random)
-            if blog_list:
-                blog_random.append(blog_list)
+        if count_blog > 0:
+            while len(blog_random) < 3:
+                pk_for_random = random.randint(1, count_blog)
+                blog_list = Blog.objects.filter(is_public=True).filter(pk=pk_for_random).first()
+                if blog_list and blog_list not in blog_random:
+                    blog_random.append(blog_list)
 
         context = {
             'count_mailing': count_mailing,
@@ -39,7 +38,7 @@ class IndexView(generic.View):
             'blog_random': blog_random,
             'title': 'Главная'
         }
-        print(count_mailing, count_mailing_active, count_unique_client, blog_random)
+
         return render(request, 'main/index.html', context)
 
 
